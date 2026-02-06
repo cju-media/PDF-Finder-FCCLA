@@ -1,22 +1,5 @@
 const https = require('https');
 
-let maxApi;
-try {
-	maxApi = require('max-api');
-} catch (error) {
-	// Mock max-api for testing outside of Max environment
-	maxApi = {
-		addHandler: (name, callback) => {
-			// Expose handler for testing
-			if (!module.exports.handlers) module.exports.handlers = {};
-			module.exports.handlers[name] = callback;
-		},
-		outlet: (...args) => console.log('OUTLET:', ...args),
-		post: (...args) => console.log('POST:', ...args)
-	};
-	module.exports.maxApiMock = maxApi;
-}
-
 const USER = 'TheCathedralFCCLA';
 const REPO = 'OW';
 const API_URL = `https://api.github.com/repos/${USER}/${REPO}/contents/`;
@@ -24,7 +7,7 @@ const API_URL = `https://api.github.com/repos/${USER}/${REPO}/contents/`;
 const getLatestPDF = () => {
 	const options = {
 		headers: {
-			'User-Agent': 'Node-for-Max-Script'
+			'User-Agent': 'Node-Script'
 		}
 	};
 
@@ -38,7 +21,7 @@ const getLatestPDF = () => {
 		res.on('end', () => {
 			try {
 				if (res.statusCode !== 200) {
-					maxApi.post(`Error fetching data: ${res.statusCode} ${res.statusMessage}`);
+					console.error(`Error fetching data: ${res.statusCode} ${res.statusMessage}`);
 					return;
 				}
 
@@ -49,21 +32,18 @@ const getLatestPDF = () => {
 				if (pdfFile) {
 					// Construct the GitHub Pages URL
 					const pdfUrl = `https://${USER}.github.io/${REPO}/${encodeURIComponent(pdfFile.name)}`;
-					maxApi.outlet(pdfUrl);
+					console.log(pdfUrl);
 				} else {
-					maxApi.post('No PDF found');
+					console.error('No PDF found');
 				}
 			} catch (e) {
-				maxApi.post(`Error parsing JSON: ${e.message}`);
+				console.error(`Error parsing JSON: ${e.message}`);
 			}
 		});
 
 	}).on('error', (err) => {
-		maxApi.post(`Error making request: ${err.message}`);
+		console.error(`Error making request: ${err.message}`);
 	});
 };
 
-// Add a handler for the 'bang' message
-maxApi.addHandler('bang', () => {
-	getLatestPDF();
-});
+getLatestPDF();
