@@ -54,7 +54,10 @@ const getLatestPDF = async () => {
             // Construct a raw.githubusercontent.com URL for the specific commit
             // Format: https://raw.githubusercontent.com/:user/:repo/:sha/:path
             const pdfUrl = `https://raw.githubusercontent.com/${USER}/${REPO}/${latestCommitSha}/${encodeURIComponent(pdfFile.name)}`;
-            console.log(pdfUrl);
+
+            // Wrap the PDF URL in the Google Docs Viewer
+            const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+            console.log(googleDocsUrl);
         } else {
             console.error('No PDF found in the latest commit.');
         }
