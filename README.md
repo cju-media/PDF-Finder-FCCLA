@@ -1,1 +1,1 @@
-Finds the SHA link for the PDF found in this(https://github.com/TheCathedralFCCLA/OW) repo
+Finds the direct SHA link for the PDF found in the [FCCLA OW Display](https://github.com/TheCathedralFCCLA/OW) repo to generate direct links that will live in FCCLA service live stream description and QR code.
