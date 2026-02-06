@@ -29,22 +29,22 @@ const getJSON = (url) => {
     });
 };
 
-const getPreviousPDF = async () => {
+const getLatestPDF = async () => {
     try {
         // 1. Get list of commits
         const commitsUrl = `https://api.github.com/repos/${USER}/${REPO}/commits`;
         const commits = await getJSON(commitsUrl);
 
-        if (!Array.isArray(commits) || commits.length < 2) {
-            console.error('Not enough commits found to retrieve previous version.');
+        if (!Array.isArray(commits) || commits.length === 0) {
+            console.error('No commits found.');
             return;
         }
 
-        // Get the SHA of the previous commit (index 1)
-        const previousCommitSha = commits[1].sha;
+        // Get the SHA of the latest commit (index 0)
+        const latestCommitSha = commits[0].sha;
 
         // 2. Get contents of the repo at that commit
-        const contentsUrl = `https://api.github.com/repos/${USER}/${REPO}/contents/?ref=${previousCommitSha}`;
+        const contentsUrl = `https://api.github.com/repos/${USER}/${REPO}/contents/?ref=${latestCommitSha}`;
         const files = await getJSON(contentsUrl);
 
         // Find the first file ending in .pdf
@@ -53,10 +53,13 @@ const getPreviousPDF = async () => {
         if (pdfFile) {
             // Construct a raw.githubusercontent.com URL for the specific commit
             // Format: https://raw.githubusercontent.com/:user/:repo/:sha/:path
-            const pdfUrl = `https://raw.githubusercontent.com/${USER}/${REPO}/${previousCommitSha}/${encodeURIComponent(pdfFile.name)}`;
-            console.log(pdfUrl);
+            const pdfUrl = `https://raw.githubusercontent.com/${USER}/${REPO}/${latestCommitSha}/${encodeURIComponent(pdfFile.name)}`;
+
+            // Wrap the PDF URL in the Google Docs Viewer
+            const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+            console.log(googleDocsUrl);
         } else {
-            console.error('No PDF found in the previous commit.');
+            console.error('No PDF found in the latest commit.');
         }
 
     } catch (error) {
@@ -64,4 +67,4 @@ const getPreviousPDF = async () => {
     }
 };
 
-getPreviousPDF();
+getLatestPDF();
